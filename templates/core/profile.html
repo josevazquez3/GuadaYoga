@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Profile Picture Section -->
+        <div class="col-md-4 text-center mb-4">
+            <div class="profile-picture-container mb-3">
+                {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 200px; height: 200px; object-fit: cover;">
+                {% else %}
+                    <div class="default-profile-picture rounded-circle d-flex align-items-center justify-content-center" style="width: 200px; height: 200px; background-color: #gray; margin: 0 auto;">
+                        <i class="fas fa-user fa-5x text-white"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="mb-4">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                </div>
+                <button type="submit" name="update_picture" class="btn btn-primary">Actualizar Foto</button>
+            </form>
+        </div>
+
+        <!-- User Information Section -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Información del Perfil</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="username" value="{{ user.username }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                        </div>
+                        <button type="submit" name="update_profile" class="btn btn-primary">Actualizar Perfil</button>
+                    </form>
+
+                    <!-- Password Change Section -->
+                    <h4 class="mt-4 mb-3">Cambiar Contraseña</h4>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Contraseña Actual</label>
+                            <input type="password" class="form-control" id="current_password" name="current_password">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password1" class="form-label">Nueva Contraseña</label>
+                            <input type="password" class="form-control" id="new_password1" name="new_password1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password2" class="form-label">Confirmar Nueva Contraseña</label>
+                            <input type="password" class="form-control" id="new_password2" name="new_password2">
+                        </div>
+                        <button type="submit" name="change_password" class="btn btn-warning">Cambiar Contraseña</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Staff User Management Section -->
+            {% if user.is_staff %}
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">Gestión de Usuarios</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Email</th>
+                                    <th>Staff</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user_item in users %}
+                                <tr>
+                                    <td>{{ user_item.username }}</td>
+                                    <td>{{ user_item.email }}</td>
+                                    <td>
+                                        <form method="POST" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ user_item.id }}">
+                                            <button type="submit" name="toggle_staff" class="btn btn-sm {% if user_item.is_staff %}btn-success{% else %}btn-secondary{% endif %}">
+                                                {% if user_item.is_staff %}Staff{% else %}Regular{% endif %}
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="user_id" value="{{ user_item.id }}">
+                                            <button type="submit" name="delete_user" class="btn btn-sm btn-danger" {% if user_item == user %}disabled{% endif %}>
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+Hola,
+
+Gracias por registrarte en Guada Yoga. Para completar tu registro y poder iniciar sesión, por favor confirma tu dirección de correo electrónico haciendo clic en el siguiente enlace:
+
+{{ activate_url }}
+
+Este enlace estará activo durante {{ expiration_days }} días.
+
+Si no has creado una cuenta en Guada Yoga, puedes ignorar este mensaje.
+
+Saludos,
+Equipo de Guada Yoga

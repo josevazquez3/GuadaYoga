@@ -1,0 +1,14 @@
+Hola,
+
+Estás recibiendo este correo porque intentaste registrarte en Guada Yoga con esta dirección de correo electrónico:
+
+{{ email }}
+
+Sin embargo, ya existe una cuenta con este correo electrónico. Si olvidaste tu contraseña, puedes restablecerla haciendo clic en el siguiente enlace:
+
+{{ password_reset_url }}
+
+Si no solicitaste este registro, puedes ignorar este correo electrónico.
+
+¡Gracias por usar Guada Yoga!
+El equipo de Guada Yoga

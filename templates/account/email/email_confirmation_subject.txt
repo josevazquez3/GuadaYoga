@@ -1,0 +1,2 @@
+{% load i18n %}
+¡Bienvenido a Guada Yoga! Por favor verifica tu correo electrónico

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load embed_video_tags %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-4">🧘‍♀️ Biblioteca de Videos</h1>
+        {% if user.is_staff %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createVideoModal">
+            <i class="fas fa-plus"></i> Agregar Video
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="lotus-divider mb-4"></div>
+
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for video in videos %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="embed-responsive embed-responsive-16by9">
+                    {% video video.url '100% x 315' %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ video.title }}</h5>
+                    <p class="card-text">{{ video.summary }}</p>
+                    {% if user.is_staff %}
+                    <div class="d-flex justify-content-end">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" 
+                                    data-bs-target="#editVideoModal{{ video.pk }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteVideoModal{{ video.pk }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% include 'core/modals/video_modals.html' %}
+{% endblock %}

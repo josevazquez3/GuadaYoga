@@ -1,0 +1,15 @@
+{% load account %}
+{% user_display user as user_display %}
+{% load i18n %}
+{% autoescape off %}
+¡Bienvenido a Guada Yoga!
+
+Gracias por registrarte en nuestra comunidad de yoga. Para completar tu registro y acceder a todos nuestros servicios, por favor verifica tu dirección de correo electrónico haciendo clic en el siguiente enlace:
+
+{{ activate_url }}
+
+Si no has creado una cuenta en Guada Yoga, puedes ignorar este mensaje.
+
+Namaste,
+Equipo de Guada Yoga
+{% endautoescape %}

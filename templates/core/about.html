@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mb-5">✨ Sobre Nosotros</h1>
+
+    <style>
+        .about-image {
+            height: 100%;
+            min-height: 400px;
+            width: 100%;
+            object-fit: cover;
+        }
+        .about-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+    </style>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <img src="https://images.unsplash.com/photo-1516571748831-5d81767b788d?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="img-fluid rounded shadow about-image" alt="Astrología">
+        </div>
+        <div class="col-md-6 about-content">
+            <h2>🌟 Astrología</h2>
+            <p class="lead">Descubre el lenguaje de los astros y su influencia en tu vida</p>
+            <p>La astrología es una herramienta ancestral que nos permite comprender mejor nuestro propósito de vida, potenciales y desafíos. A través de nuestros cursos, aprenderás:</p>
+            <ul>
+                <li>Interpretación de cartas natales</li>
+                <li>Tránsitos y progresiones</li>
+                <li>Sinastría y compatibilidad</li>
+                <li>Astrología predictiva</li>
+            </ul>
+            <div class="card bg-light p-3 mt-3">
+                <h5>💫 Cursos Disponibles</h5>
+                <ul class="list-unstyled mb-0">
+                    <li>✓ Astrología Básica</li>
+                    <li>✓ Astrología Intermedia</li>
+                    <li>✓ Astrología Avanzada</li>
+                    <li>✓ Consultas Personalizadas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="lotus-divider"></div>
+
+    <div class="row mb-5">
+        <div class="col-md-6 order-md-2">
+            <img src="https://images.unsplash.com/photo-1619969403139-65ed6035f460?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="img-fluid rounded shadow" alt="Registros Akáshicos">
+        </div>
+        <div class="col-md-6 order-md-1">
+            <h2>📚 Registros Akáshicos</h2>
+            <p class="lead">Accede a la biblioteca universal de la consciencia</p>
+            <p>Los Registros Akáshicos son un campo energético que contiene toda la información sobre tu alma, tus vidas pasadas y tu propósito actual. A través de nuestros servicios, podrás:</p>
+            <ul>
+                <li>Descubrir tu propósito de vida</li>
+                <li>Sanar patrones kármicos</li>
+                <li>Resolver conflictos emocionales</li>
+                <li>Acceder a tu sabiduría interior</li>
+            </ul>
+            <div class="card bg-light p-3 mt-3">
+                <h5>🌈 Servicios Ofrecidos</h5>
+                <ul class="list-unstyled mb-0">
+                    <li>✓ Lecturas Personalizadas</li>
+                    <li>✓ Curso de Apertura de Registros</li>
+                    <li>✓ Sanación Akáshica</li>
+                    <li>✓ Mentorías Espirituales</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="lotus-divider"></div>
+
+    <div class="text-center mb-5">
+        <h2>🌸 ¿Por qué elegirnos?</h2>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h5">👩‍🏫 Experiencia</h3>
+                        <p>Años de experiencia en la enseñanza y práctica de la astrología y registros akáshicos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h5">🎯 Enfoque Personalizado</h3>
+                        <p>Atención individualizada y adaptada a las necesidades de cada estudiante.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h5">💖 Comunidad</h3>
+                        <p>Forma parte de una comunidad comprometida con el crecimiento espiritual.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <a href="{% url 'contact' %}" class="btn btn-primary btn-lg">📞 Contáctanos para más información</a>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+    .col-md-6 img {
+        max-height: 400px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 15px;
+    }
+</style>
