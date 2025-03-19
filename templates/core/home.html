@@ -55,7 +55,7 @@
                     <h5 class="card-title">{{ video.title }}</h5>
                     <p class="card-text">{{ video.summary|truncatewords:30 }}</p>
                     {% if user.is_authenticated %}
-                    <a href="{% url 'video_detail' video.pk %}" class="btn btn-primary">Ver Video</a>
+                    <a href="{% url 'video_list' %}" class="btn btn-primary">Ver Video</a>
                     {% else %}
                     <a href="{% url 'account_login' %}" class="btn btn-primary">Ingresar para ver</a>
                     {% endif %}

@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load static %}
 
 {% block content %}
 <div class="container">
@@ -7,21 +9,45 @@
             <div class="card shadow mt-5">
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4">🌟 Registro</h2>
-                    <form method="post">
+                    <form method="post" id="signupForm">
                         {% csrf_token %}
                         {% if form.errors %}
                         <div class="alert alert-danger">
-                            {% for field in form %}
-                                {% for error in field.errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
+                            {% for field, errors in form.errors.items %}
+                                {% if field == 'username' %}
+                                    <p><i class="fas fa-exclamation-circle"></i> El nombre de usuario "{{ form.username.value }}" ya está en uso. Por favor, elige otro.</p>
+                                {% else %}
+                                    {% for error in errors %}
+                                        <p><i class="fas fa-exclamation-circle"></i> {{ error }}</p>
+                                    {% endfor %}
+                                {% endif %}
                             {% endfor %}
                             {% for error in form.non_field_errors %}
-                                <p>{{ error }}</p>
+                                <p><i class="fas fa-exclamation-circle"></i> {{ error }}</p>
                             {% endfor %}
                         </div>
                         {% endif %}
-                        {{ form.as_p|safe }}
+                        <div id="username-feedback" class="alert alert-warning d-none">
+                            <i class="fas fa-exclamation-triangle"></i> Este nombre de usuario ya está en uso. Por favor, elige otro.
+                        </div>
+                        
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {% render_field field class="form-control" %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% if field.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
                         <div class="mb-3">
                             <small class="text-muted">Al registrarte, recibirás un correo de confirmación para activar tu cuenta.</small>
                         </div>
@@ -52,4 +78,6 @@
         font-size: 1.1rem;
     }
 </style>
+
+<script src="{% static 'js/signup-validation.js' %}"></script>
 {% endblock %}

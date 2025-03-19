@@ -124,7 +124,7 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">👤 Perfil</a>
+                            <a class="nav-link" href="{% url 'profile' %}">👤 {{ user.username }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'account_logout' %}">🚪 Salir</a>

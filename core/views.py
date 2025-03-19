@@ -138,6 +138,25 @@ def profile(request):
             else:
                 messages.error(request, 'La contraseña actual es incorrecta.')
         
+        elif 'create_user' in request.POST and request.user.is_staff:
+            new_username = request.POST.get('new_username')
+            new_email = request.POST.get('new_email')
+            new_password = request.POST.get('new_password')
+            new_is_staff = request.POST.get('new_is_staff') == 'on'
+            
+            if User.objects.filter(username=new_username).exists():
+                messages.error(request, 'El nombre de usuario ya existe.')
+            elif User.objects.filter(email=new_email).exists():
+                messages.error(request, 'El correo electrónico ya está registrado.')
+            else:
+                new_user = User.objects.create_user(
+                    username=new_username,
+                    email=new_email,
+                    password=new_password,
+                    is_staff=new_is_staff
+                )
+                messages.success(request, f'Usuario {new_username} creado exitosamente')
+        
         elif 'toggle_staff' in request.POST and request.user.is_staff:
             user_id = request.POST.get('user_id')
             target_user = User.objects.get(id=user_id)

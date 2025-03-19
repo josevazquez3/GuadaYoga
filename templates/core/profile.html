@@ -10,7 +10,7 @@
                 {% if user.profile.profile_picture %}
                     <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle img-fluid" style="width: 200px; height: 200px; object-fit: cover;">
                 {% else %}
-                    <div class="default-profile-picture rounded-circle d-flex align-items-center justify-content-center" style="width: 200px; height: 200px; background-color: #gray; margin: 0 auto;">
+                    <div class="default-profile-picture rounded-circle d-flex align-items-center justify-content-center" style="width: 200px; height: 200px; background-color: #808080; margin: 0 auto;">
                         <i class="fas fa-user fa-5x text-white"></i>
                     </div>
                 {% endif %}
@@ -76,6 +76,32 @@
             <div class="card mt-4">
                 <div class="card-body">
                     <h3 class="card-title mb-4">Gestión de Usuarios</h3>
+                    
+                    <!-- Create User Form -->
+                    <div class="mb-4">
+                        <h4>Crear Nuevo Usuario</h4>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="new_username" class="form-label">Nombre de Usuario</label>
+                                <input type="text" class="form-control" id="new_username" name="new_username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="new_email" name="new_email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password" required>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="new_is_staff" name="new_is_staff">
+                                <label class="form-check-label" for="new_is_staff">Es Staff</label>
+                            </div>
+                            <button type="submit" name="create_user" class="btn btn-success mb-4">Crear Usuario</button>
+                        </form>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table">
                             <thead>
