@@ -123,8 +123,15 @@
                 </ul>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">👤 {{ user.username }}</a>
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link d-flex align-items-center" href="{% url 'profile' %}">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user me-2"></i>
+                                {% endif %}
+                                {{ user.username }}
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'account_logout' %}">🚪 Salir</a>
