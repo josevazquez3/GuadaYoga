@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Video, Contact, Profile
+from .models import Video, Contact, Profile, Room
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -45,6 +45,52 @@ def contact(request):
         return redirect('contact')
     
     return render(request, 'core/contact.html')
+
+@login_required
+def room_list(request):
+    rooms = Room.objects.all().order_by('date', 'time')
+    return render(request, 'core/room_list.html', {'rooms': rooms})
+
+@staff_member_required
+def create_room(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        meeting_link = request.POST.get('meeting_link')
+        
+        room = Room.objects.create(
+            title=title,
+            date=date,
+            time=time,
+            meeting_link=meeting_link,
+            created_by=request.user
+        )
+        
+        messages.success(request, 'Sala creada exitosamente!')
+        return redirect('room_list')
+    
+    return redirect('room_list')
+
+@staff_member_required
+def delete_room(request, pk):
+    room = get_object_or_404(Room, pk=pk)
+    if request.method == 'POST':
+        room.delete()
+        messages.success(request, 'Sala eliminada exitosamente!')
+    return redirect('room_list')
+
+@staff_member_required
+def edit_room(request, pk):
+    room = get_object_or_404(Room, pk=pk)
+    if request.method == 'POST':
+        room.title = request.POST.get('title')
+        room.date = request.POST.get('date')
+        room.time = request.POST.get('time')
+        room.meeting_link = request.POST.get('meeting_link')
+        room.save()
+        messages.success(request, 'Sala actualizada exitosamente!')
+    return redirect('room_list')
 
 @login_required
 def video_list(request):

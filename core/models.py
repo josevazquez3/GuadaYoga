@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from embed_video.fields import EmbedVideoField
+from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -36,3 +37,28 @@ class Contact(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.surname} - {self.subject}"
+
+class Room(models.Model):
+    title = models.CharField(max_length=200)
+    date = models.DateField()
+    time = models.TimeField()
+    meeting_link = models.URLField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['date', 'time']
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def datetime(self):
+        return timezone.make_aware(
+            timezone.datetime.combine(self.date, self.time)
+        )
+
+    @property
+    def is_past(self):
+        return self.datetime < timezone.now()
