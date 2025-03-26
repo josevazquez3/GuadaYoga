@@ -3,9 +3,58 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Video, Contact, Profile, Room
+from .models import Video, Contact, Profile, Room, Workshop
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
+
+def workshops(request):
+    workshops = Workshop.objects.all().order_by('date', 'time')
+    return render(request, 'core/workshops.html', {'workshops': workshops})
+
+@staff_member_required
+def workshop_create(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        date = request.POST.get('date')
+        time = request.POST.get('time')
+        image = request.FILES.get('image')
+        
+        workshop = Workshop.objects.create(
+            title=title,
+            description=description,
+            date=date,
+            time=time,
+            image=image,
+            created_by=request.user
+        )
+        
+        messages.success(request, 'Taller creado exitosamente!')
+        return redirect('workshops')
+    
+    return redirect('workshops')
+
+@staff_member_required
+def workshop_edit(request, pk):
+    workshop = get_object_or_404(Workshop, pk=pk)
+    if request.method == 'POST':
+        workshop.title = request.POST.get('title')
+        workshop.description = request.POST.get('description')
+        workshop.date = request.POST.get('date')
+        workshop.time = request.POST.get('time')
+        if 'image' in request.FILES:
+            workshop.image = request.FILES['image']
+        workshop.save()
+        messages.success(request, 'Taller actualizado exitosamente!')
+    return redirect('workshops')
+
+@staff_member_required
+def workshop_delete(request, pk):
+    workshop = get_object_or_404(Workshop, pk=pk)
+    if request.method == 'POST':
+        workshop.delete()
+        messages.success(request, 'Taller eliminado exitosamente!')
+    return redirect('workshops')
 
 def home(request):
     videos = Video.objects.all()[:3]  # Get latest 3 videos

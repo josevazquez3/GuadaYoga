@@ -62,3 +62,29 @@ class Room(models.Model):
     @property
     def is_past(self):
         return self.datetime < timezone.now()
+
+class Workshop(models.Model):
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='workshop_images/', null=True, blank=True)
+    description = models.TextField()
+    date = models.DateField()
+    time = models.TimeField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['date', 'time']
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def datetime(self):
+        return timezone.make_aware(
+            timezone.datetime.combine(self.date, self.time)
+        )
+
+    @property
+    def is_past(self):
+        return self.datetime < timezone.now()

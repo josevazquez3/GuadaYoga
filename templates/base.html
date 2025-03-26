@@ -117,6 +117,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'room_list' %}">🎥 Salas</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'workshops' %}">📚 Talleres</a>
+                    </li>
                     {% if user.is_authenticated %}
                         <li class="nav-item d-flex align-items-center">
                             <a class="nav-link d-flex align-items-center" href="{% url 'profile' %}">
