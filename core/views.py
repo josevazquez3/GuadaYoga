@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from .models import Video, Contact, Profile, Room, Workshop
 from django.contrib.auth.models import User
 from django.contrib.admin.views.decorators import staff_member_required
@@ -14,23 +15,28 @@ def workshops(request):
 @staff_member_required
 def workshop_create(request):
     if request.method == 'POST':
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        date = request.POST.get('date')
-        time = request.POST.get('time')
-        image = request.FILES.get('image')
-        
-        workshop = Workshop.objects.create(
-            title=title,
-            description=description,
-            date=date,
-            time=time,
-            image=image,
-            created_by=request.user
-        )
-        
-        messages.success(request, 'Taller creado exitosamente!')
-        return redirect('workshops')
+        try:
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            date = request.POST.get('date')
+            time = request.POST.get('time')
+            image = request.FILES.get('image')
+            
+            workshop = Workshop.objects.create(
+                title=title,
+                description=description,
+                date=date,
+                time=time,
+                image=image,
+                created_by=request.user
+            )
+            
+            messages.success(request, 'Taller creado exitosamente!')
+            return redirect('workshops')
+        except ValidationError as e:
+            messages.error(request, f'Error de validación: {e}')
+        except Exception as e:
+            messages.error(request, f'Error al crear el taller: {str(e)}')
     
     return redirect('workshops')
 

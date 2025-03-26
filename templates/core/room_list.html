@@ -27,6 +27,9 @@
                         <i class="fas fa-video"></i> Unirse a la Sala
                     </a>
                     {% endif %}
+                    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#reservationModal{{ room.id }}">
+                        <i class="fas fa-calendar-check"></i> Reservar
+                    </button>
                     <div class="countdown" data-datetime="{{ room.datetime|date:'Y-m-d H:i:s' }}">
                         Cargando contador...
                     </div>
@@ -53,6 +56,54 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Reservation Modals -->
+{% for room in rooms %}
+<div class="modal fade" id="reservationModal{{ room.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reservar Clase - {{ room.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'contact' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="subject" value="Reserva para {{ room.title }} - {{ room.date|spanish_date }} {{ room.time }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name{{ room.id }}" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="name{{ room.id }}" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="surname{{ room.id }}" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="surname{{ room.id }}" name="surname" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="email{{ room.id }}" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email{{ room.id }}" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone{{ room.id }}" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="phone{{ room.id }}" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message{{ room.id }}" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="message{{ room.id }}" name="message" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar Reserva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% if user.is_staff %}
 <!-- Create Room Modal -->

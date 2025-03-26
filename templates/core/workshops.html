@@ -2,16 +2,18 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Talleres de Yoga</h1>
+    <div class="text-center mb-5">
+        <h1 style="font-size: 3.5rem;">Talleres de Yoga</h1>
         {% if user.is_staff %}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkshopModal">
-            <i class="fas fa-plus"></i> Agregar Taller
-        </button>
+        <div class="mt-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addWorkshopModal">
+                <i class="fas fa-plus"></i> Agregar Taller
+            </button>
+        </div>
         {% endif %}
     </div>
 
-    <div class="row">
+    <div class="row justify-content-center">
         {% for workshop in workshops %}
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card h-100">
@@ -19,20 +21,25 @@
                 <img src="{{ workshop.image.url }}" class="card-img-top" alt="{{ workshop.title }}">
                 {% endif %}
                 <div class="card-body">
-                    <h5 class="card-title">{{ workshop.title }}</h5>
-                    <p class="card-text">{{ workshop.description }}</p>
-                    <p class="card-text">
+                    <h5 class="card-title fs-3 mb-3" style="font-weight: bold;">{{ workshop.title }}</h5>
+                    <p class="card-text fs-5 mb-4">{{ workshop.description }}</p>
+                    <p class="card-text fs-5">
                         <small class="text-muted">
-                            <i class="far fa-calendar"></i> {{ workshop.date|date:"d/m/Y" }}<br>
-                            <i class="far fa-clock"></i> {{ workshop.time|time:"H:i" }}
+                            <i class="far fa-calendar"></i> <span class="fs-5" style="font-weight: bold;">{{ workshop.date|date:"d/m/Y" }}</span><br>
+                            <i class="far fa-clock"></i> <span class="fs-5" style="font-weight: bold;">{{ workshop.time|time:"H:i" }}</span>
                         </small>
                     </p>
+                    <div class="text-center">
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#reservationModal{{ workshop.id }}">
+                            <i class="fas fa-calendar-check"></i> Reservar
+                        </button>
+                    </div>
                     {% if user.is_staff %}
-                    <div class="mt-3">
+                    <div class="mt-3 text-center">
                         <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editWorkshopModal{{ workshop.id }}">
                             <i class="fas fa-edit"></i> Editar
                         </button>
-                        <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteWorkshopModal{{ workshop.id }}">
+                        <button class="btn btn-sm btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteWorkshopModal{{ workshop.id }}">
                             <i class="fas fa-trash"></i> Eliminar
                         </button>
                     </div>
@@ -40,14 +47,61 @@
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12">
-            <p class="text-center">No hay talleres disponibles en este momento.</p>
-        </div>
         {% endfor %}
     </div>
+</div>
 
-    {% if user.is_staff %}
+<!-- Reservation Modals -->
+{% for workshop in workshops %}
+<div class="modal fade" id="reservationModal{{ workshop.id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Reservar Taller - {{ workshop.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'contact' %}" class="workshop-reservation-form">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <input type="hidden" name="subject" value="Reserva para {{ workshop.title }} - {{ workshop.date|date:'d/m/Y' }} {{ workshop.time|time:'H:i' }}">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="name{{ workshop.id }}" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="name{{ workshop.id }}" name="name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="surname{{ workshop.id }}" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="surname{{ workshop.id }}" name="surname" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="email{{ workshop.id }}" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email{{ workshop.id }}" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone{{ workshop.id }}" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="phone{{ workshop.id }}" name="phone" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message{{ workshop.id }}" class="form-label">Mensaje</label>
+                        <textarea class="form-control" id="message{{ workshop.id }}" name="message" rows="3" required></textarea>
+                    </div>
+                    <div class="alert alert-success d-none" role="alert"></div>
+                    <div class="alert alert-danger d-none" role="alert"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar Reserva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% if user.is_staff %}
     <!-- Add Workshop Modal -->
     <div class="modal fade" id="addWorkshopModal" tabindex="-1">
         <div class="modal-dialog">
@@ -69,7 +123,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha</label>
-                            <input type="date" name="date" class="form-control" required>
+                            <input type="date" name="date" class="form-control" required pattern="\d{4}-\d{2}-\d{2}" max="2099-12-31" min="2023-01-01" oninvalid="this.setCustomValidity('Por favor ingrese una fecha válida en formato YYYY-MM-DD')" oninput="this.setCustomValidity('')">
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Hora</label>
@@ -159,3 +213,53 @@
     {% endif %}
 </div>
 {% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.workshop-reservation-form');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const successAlert = this.querySelector('.alert-success');
+            const errorAlert = this.querySelector('.alert-danger');
+            const submitButton = this.querySelector('button[type="submit"]');
+            
+            submitButton.disabled = true;
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    successAlert.textContent = 'Reserva enviada con éxito. Nos pondremos en contacto contigo pronto.';
+                    successAlert.classList.remove('d-none');
+                    errorAlert.classList.add('d-none');
+                    this.reset();
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(this.closest('.modal'));
+                        modal.hide();
+                        successAlert.classList.add('d-none');
+                    }, 3000);
+                } else {
+                    throw new Error(data.message || 'Error al enviar la reserva');
+                }
+            })
+            .catch(error => {
+                errorAlert.textContent = error.message;
+                errorAlert.classList.remove('d-none');
+                successAlert.classList.add('d-none');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+            });
+        });
+    });
+});
+</script>
