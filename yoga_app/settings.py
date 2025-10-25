@@ -76,13 +76,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'yoga_app.wsgi.application'
 
 # Email Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'guadayoga777@gmail.com'
-EMAIL_HOST_PASSWORD = 'vvmc bvnz eyky hbsd'
-DEFAULT_FROM_EMAIL = 'guadayoga777@gmail.com'
+# Prefer environment variables for credentials. If you copied the App Password
+# from Google it may include spaces for readability; we remove spaces here to
+# avoid authentication errors (e.g. "BadCredentials").
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') in ['True', 'true', '1']
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'guadayoga777@gmail.com')
+# Read password from env and strip spaces (Google App Passwords are often shown
+# with spaces; the real password must have no spaces).
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'vvmc bvnz eyky hbsd').replace(' ', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # Message settings
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load embed_video_tags %}
 
 {% block content %}
 <div class="container py-5">
@@ -17,32 +16,62 @@
 
     {% if messages %}
     {% for message in messages %}
-    <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
         {{ message }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
     {% endif %}
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="row row-cols-1 row-cols-md-3 g-4" id="videos-container">
         {% for video in videos %}
         <div class="col">
             <div class="card h-100 shadow-sm">
-                <div class="embed-responsive embed-responsive-16by9">
-                    {% video video.url '100% x 315' %}
+                <!-- Video Container -->
+                <div class="ratio ratio-16x9 video-wrapper" id="video-wrapper-{{ video.id }}" style="background: #000; border-radius: 8px 8px 0 0;">
+                    <iframe 
+                        id="video-{{ video.id }}"
+                        data-src="{{ video.url }}"
+                        data-video-id="{{ video.id }}"
+                        title="{{ video.title }}"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen
+                        loading="lazy"
+                        style="border: none;">
+                    </iframe>
+                    
+                    <!-- Fallback cuando el video no se puede embeber -->
+                    <div class="video-fallback d-none" id="fallback-{{ video.id }}" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center;">
+                        <i class="fab fa-youtube fa-3x mb-3"></i>
+                        <h5>Este video no permite reproducción embebida</h5>
+                        <p class="mb-3">Pero puedes verlo directamente en YouTube</p>
+                        <a href="{{ video.url }}" target="_blank" class="btn btn-light btn-lg">
+                            <i class="fab fa-youtube"></i> Ver en YouTube
+                        </a>
+                    </div>
                 </div>
+                
                 <div class="card-body">
                     <h5 class="card-title">{{ video.title }}</h5>
-                    <p class="card-text">{{ video.summary }}</p>
+                    <p class="card-text">{{ video.summary|truncatewords:20 }}</p>
+                    
+                    <!-- Botón alternativo para ver en YouTube -->
+                    <a href="{{ video.url }}" target="_blank" class="btn btn-outline-danger btn-sm w-100 mb-2">
+                        <i class="fab fa-youtube"></i> Ver en YouTube
+                    </a>
+                    
                     {% if user.is_staff %}
-                    <div class="d-flex justify-content-end">
-                        <div class="btn-group">
+                    <div class="d-flex justify-content-end mt-2">
+                        <div class="btn-group btn-group-sm">
                             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" 
-                                    data-bs-target="#editVideoModal{{ video.pk }}">
+                                    data-bs-target="#editVideoModal{{ video.pk }}"
+                                    title="Editar">
                                 <i class="fas fa-edit"></i>
                             </button>
                             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                    data-bs-target="#deleteVideoModal{{ video.pk }}">
+                                    data-bs-target="#deleteVideoModal{{ video.pk }}"
+                                    title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -51,9 +80,249 @@
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center py-5">
+                <i class="fas fa-video fa-3x mb-3 d-block"></i>
+                <h4>No hay videos disponibles</h4>
+                <p class="mb-0">Pronto agregaremos contenido nuevo.</p>
+                {% if user.is_staff %}
+                <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#createVideoModal">
+                    <i class="fas fa-plus"></i> Agregar el Primer Video
+                </button>
+                {% endif %}
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>
 
-{% include 'core/modals/video_modals.html' %}
+<!-- Modales -->
+{% if user.is_staff %}
+{% for video in videos %}
+<!-- Modal Editar Video -->
+<div class="modal fade" id="editVideoModal{{ video.pk }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'video_edit' video.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control" name="title" value="{{ video.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL de YouTube</label>
+                        <input type="url" class="form-control" name="url" value="{{ video.url }}" required>
+                        <small class="text-muted">
+                            ⚠️ Nota: Algunos videos no permiten reproducción embebida
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Resumen</label>
+                        <textarea class="form-control" name="summary" rows="3" required>{{ video.summary }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Eliminar Video -->
+<div class="modal fade" id="deleteVideoModal{{ video.pk }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'video_delete' video.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el video "<strong>{{ video.title }}</strong>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal Crear Video -->
+<div class="modal fade" id="createVideoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agregar Nuevo Video</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'video_create' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título</label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL de YouTube</label>
+                        <input type="url" class="form-control" name="url" placeholder="https://www.youtube.com/watch?v=..." required>
+                        <small class="form-text text-muted">
+                            Formatos: youtube.com/watch?v= o youtu.be/<br>
+                            ⚠️ Algunos videos no permiten reproducción embebida
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Resumen</label>
+                        <textarea class="form-control" name="summary" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar Video</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .ratio-16x9 {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .ratio-16x9 iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .video-fallback {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+    }
+    
+    .card-title {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .btn-outline-danger:hover {
+        background-color: #ff0000;
+        border-color: #ff0000;
+    }
+</style>
+
+<script>
+// Función para extraer ID de YouTube
+function getYouTubeId(url) {
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=)([^&\s]+)/,
+        /(?:youtu\.be\/)([^&\s]+)/,
+        /(?:youtube\.com\/embed\/)([^&\s]+)/,
+        /(?:youtube\.com\/v\/)([^&\s]+)/
+    ];
+    
+    for (let pattern of patterns) {
+        const match = url.match(pattern);
+        if (match && match[1]) {
+            return match[1];
+        }
+    }
+    return null;
+}
+
+// Cargar todos los videos cuando la página esté lista
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎬 Cargando videos...');
+    
+    // Obtener todos los iframes
+    const iframes = document.querySelectorAll('iframe[data-src]');
+    
+    console.log(`📹 Encontrados ${iframes.length} videos`);
+    
+    iframes.forEach((iframe, index) => {
+        const originalUrl = iframe.getAttribute('data-src');
+        const videoDbId = iframe.getAttribute('data-video-id');
+        
+        console.log(`\n📹 Video ${index + 1}:`);
+        console.log(`   URL original: ${originalUrl}`);
+        
+        const videoId = getYouTubeId(originalUrl);
+        
+        if (videoId) {
+            // Construir URL de embed con parámetros adicionales
+            // Intentamos primero con youtube-nocookie
+            const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+            console.log(`   ✅ ID extraído: ${videoId}`);
+            console.log(`   ✅ URL embed: ${embedUrl}`);
+            
+            // Establecer la URL del iframe
+            iframe.src = embedUrl;
+            
+            // Detectar si el video no se puede cargar (Error 153)
+            // Esperamos 3 segundos y verificamos si hay error
+            setTimeout(() => {
+                // Si el iframe está vacío o tiene error, mostramos el fallback
+                iframe.onerror = function() {
+                    console.warn(`   ⚠️ Video ${videoId} tiene restricciones de embebido`);
+                    showFallback(videoDbId);
+                };
+            }, 3000);
+            
+        } else {
+            console.error(`   ❌ No se pudo extraer ID de: ${originalUrl}`);
+            showFallback(videoDbId);
+        }
+    });
+    
+    console.log('\n✅ Carga completada');
+    
+    // Función para mostrar el fallback
+    function showFallback(videoId) {
+        const wrapper = document.getElementById(`video-wrapper-${videoId}`);
+        const fallback = document.getElementById(`fallback-${videoId}`);
+        const iframe = document.getElementById(`video-${videoId}`);
+        
+        if (wrapper && fallback && iframe) {
+            iframe.style.display = 'none';
+            fallback.classList.remove('d-none');
+            fallback.style.display = 'flex';
+        }
+    }
+});
+</script>
+
 {% endblock %}
